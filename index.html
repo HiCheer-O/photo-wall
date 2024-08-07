@@ -315,16 +315,31 @@
             document.body.style.overflow = ''; // 恢复页面滚动
         }
 
-        // 添加点击事件到整个模态框
+        // 点击模态框背景区域关闭模态框
         modal.addEventListener('click', function(event) {
-            if (event.target === modal || event.target === modalContent) {
-                closeModal(); // 点击模态框或模态框内容区域（不包括图片）时关闭
+            if (event.target === modal) {
+                closeModal(); // 点击模态框背景时关闭
             }
         });
 
-        // 防止点击图片本身关闭
+        // 点击 modalContent 的空白区域关闭模态框
         modalContent.addEventListener('click', function(event) {
-            event.stopPropagation(); // 阻止事件冒泡，避免点击图片时触发关闭
+            if (event.target === modalContent) {
+                closeModal(); // 点击 modalContent 的空白区域时关闭
+            }
+        });
+
+        // 阻止点击图片和按钮关闭模态框
+        modalImg.addEventListener('click', function(event) {
+            event.stopPropagation(); // 阻止事件冒泡
+        });
+
+        prev.addEventListener('click', function(event) {
+            event.stopPropagation(); // 阻止事件冒泡
+        });
+
+        next.addEventListener('click', function(event) {
+            event.stopPropagation(); // 阻止事件冒泡
         });
 
         // 关闭模态框的按钮事件
@@ -332,14 +347,12 @@
 
         // 显示上一张图片
         prev.onclick = function (event) {
-            event.stopPropagation(); // 防止事件冒泡到 modalContent
             currentIndex = (currentIndex - 1 + images.length) % images.length;
             modalImg.src = images[currentIndex];
         }
 
         // 显示下一张图片
         next.onclick = function (event) {
-            event.stopPropagation(); // 防止事件冒泡到 modalContent
             currentIndex = (currentIndex + 1) % images.length;
             modalImg.src = images[currentIndex];
         }
