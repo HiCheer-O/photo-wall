@@ -1,0 +1,349 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>照片墙</title>
+    <style>
+         body {
+            background-color: #F5F5DC;
+            margin: 0;
+            overflow: auto;
+        }
+
+        .box {
+            column-gap: 10px; /* 列之间的间距 */
+            padding: 10px;
+        }
+
+        .box img {
+            width: 100%;
+            height: auto;
+            margin-bottom: 10px; /* 图片之间的垂直间距 */
+            box-shadow: 1px 1px 5px #0bd9e2;
+            border-radius: 11px;
+            transition: transform 0.5s ease;
+            display: block; /* 使得图片能够在列中正确排列 */
+        }
+
+        .box img:hover {
+            transform: scale(1.3);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.8);
+        }
+
+        .modal-content {
+            position: relative;
+            margin: auto;
+            top: 50%;
+            transform: translateY(-50%);
+            max-width: 90%;
+            max-height: 90%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content img {
+            max-width: 80%; /* 限制图片的最大宽度为80% */
+            max-height: 80%; /* 限制图片的最大高度为80% */
+            object-fit: contain; /* 确保图片在限制范围内完整显示 */
+        }
+
+        .modal-close {
+            position: fixed;
+            top: 20px;
+            right: 60px; /* 调整右边距 */
+            font-size: 40px;
+            font-weight: bold;
+            color: #f1f1f1;
+            cursor: pointer;
+            user-select: none;
+            z-index: 1001; /* 确保关闭按钮在右箭头上方 */
+        }
+
+        .prev, .next {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 40px;
+            font-weight: bold;
+            color: #f1f1f1;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .prev {
+            left: 20px;
+        }
+
+        .next {
+            right: 20px;
+        }
+
+        /* 默认列数 */
+        .box {
+            column-count: 4;
+        }
+
+        /* 超大屏幕 (宽度 >= 1200px) */
+        @media (min-width: 1200px) {
+            .box {
+                column-count: 8;
+            }
+        }
+
+        /* 大屏幕 (宽度 >= 1200px) */
+        @media (min-width: 1200px) and (max-width: 2000px) {
+            .box {
+                column-count: 6;
+            }
+        }
+
+        /* 中等屏幕 (宽度 >= 768px) */
+        @media (min-width: 768px) and (max-width: 1199px) {
+            .box {
+                column-count: 4;
+            }
+        }
+
+        /* 小屏幕 (宽度 < 768px) */
+        @media (max-width: 767px) {
+            .box {
+                column-count: 2;
+            }
+        }
+
+        /* 超小屏幕 (宽度 < 480px) */
+        @media (max-width: 480px) {
+            .box {
+                column-count: 1;
+            }
+        }
+
+        /* 处理横屏设备 */
+        @media (orientation: landscape) {
+            .modal-content img {
+                max-width: 45%; /* 调整横屏时的最大宽度 */
+                max-height: 45%; /* 调整横屏时的最大高度 */
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="box" id="photoBox">
+        <!-- 图片会动态添加在这里 -->
+    </div>
+
+    <!-- 模态框 -->
+    <div id="myModal" class="modal">
+        <span class="modal-close">&times;</span>
+        <div class="modal-content" id="modalContent">
+            <span class="prev">&#10094;</span>
+            <img id="modalImage" src="">
+            <span class="next">&#10095;</span>
+        </div>
+    </div>
+
+    <script>
+        // 图片数组
+        const images = [
+            "./images/IMG_1703.jpg",
+            "./images/IMG_1771.jpg",
+            "./images/IMG_1774.jpg",
+            "./images/IMG_1779.jpg",
+            "./images/IMG_1785.jpg",
+            "./images/IMG_1808.jpg",
+            "./images/IMG_1082.jpg",
+            "./images/IMG_1084.jpg",
+            "./images/IMG_1112.jpg",
+            "./images/IMG_1680.jpg",
+            "./images/IMG_1690.jpg",
+            "./images/IMG_1703.jpg",
+            "./images/IMG_1771.jpg",
+            "./images/IMG_1774.jpg",
+            "./images/IMG_1779.jpg",
+            "./images/IMG_1785.jpg",
+            "./images/IMG_1808.jpg",
+            "./images/IMG_1082.jpg",
+            "./images/IMG_1084.jpg",
+            "./images/IMG_1112.jpg",
+            "./images/IMG_1680.jpg",
+            "./images/IMG_1690.jpg",
+            "./images/IMG_1703.jpg",
+            "./images/IMG_1771.jpg",
+            "./images/IMG_1774.jpg",
+            "./images/IMG_1779.jpg",
+            "./images/IMG_1785.jpg",
+            "./images/IMG_1808.jpg",
+            "./images/IMG_1082.jpg",
+            "./images/IMG_1084.jpg",
+            "./images/IMG_1112.jpg",
+            "./images/IMG_1680.jpg",
+            "./images/IMG_1690.jpg",
+            "./images/IMG_1703.jpg",
+            "./images/IMG_1771.jpg",
+            "./images/IMG_1774.jpg",
+            "./images/IMG_1779.jpg",
+            "./images/IMG_1785.jpg",
+            "./images/IMG_1808.jpg",
+            "./images/IMG_1082.jpg",
+            "./images/IMG_1084.jpg",
+            "./images/IMG_1112.jpg",
+            "./images/IMG_1680.jpg",
+            "./images/IMG_1690.jpg",
+            "./images/IMG_1703.jpg",
+            "./images/IMG_1771.jpg",
+            "./images/IMG_1774.jpg",
+            "./images/IMG_1779.jpg",
+            "./images/IMG_1785.jpg",
+            "./images/IMG_1808.jpg",
+            "./images/IMG_1082.jpg",
+            "./images/IMG_1084.jpg",
+            "./images/IMG_1112.jpg",
+            "./images/IMG_1680.jpg",
+            "./images/IMG_1690.jpg",
+            "./images/IMG_1703.jpg",
+            "./images/IMG_1771.jpg",
+            "./images/IMG_1774.jpg",
+            "./images/IMG_1779.jpg",
+            "./images/IMG_1785.jpg",
+            "./images/IMG_1808.jpg",
+            "./images/IMG_1082.jpg",
+            "./images/IMG_1084.jpg",
+            "./images/IMG_1112.jpg",
+            "./images/IMG_1680.jpg",
+            "./images/IMG_1690.jpg",
+            "./images/IMG_1703.jpg",
+            "./images/IMG_1771.jpg",
+            "./images/IMG_1774.jpg",
+            "./images/IMG_1779.jpg",
+            "./images/IMG_1785.jpg",
+            "./images/IMG_1808.jpg",
+            "./images/IMG_1082.jpg",
+            "./images/IMG_1084.jpg",
+            "./images/IMG_1112.jpg",
+            "./images/IMG_1680.jpg",
+            "./images/IMG_1690.jpg",
+            "./images/IMG_1703.jpg",
+            "./images/IMG_1771.jpg",
+            "./images/IMG_1774.jpg",
+            "./images/IMG_1779.jpg",
+            "./images/IMG_1785.jpg",
+            "./images/IMG_1808.jpg"
+        ];
+
+        // 获取容器元素
+        const box = document.getElementById('photoBox');
+        const modal = document.getElementById('myModal');
+        const modalContent = document.getElementById('modalContent');
+        const modalImg = document.getElementById('modalImage');
+        const modalClose = document.getElementsByClassName('modal-close')[0];
+        const prev = document.getElementsByClassName('prev')[0];
+        const next = document.getElementsByClassName('next')[0];
+
+        let currentIndex;
+
+        // 动态生成图片元素
+        images.forEach((src, index) => {
+            const img = document.createElement('img');
+            img.src = src;
+
+            img.onclick = function () {
+                openModal(src, index);
+            }
+
+            box.appendChild(img);
+        });
+
+        let startX, startY, endX, endY;
+
+        // 记录触摸开始时的位置
+        modal.addEventListener('touchstart', function (event) {
+            startX = event.touches[0].clientX;
+            startY = event.touches[0].clientY;
+        });
+
+        // 记录触摸结束时的位置
+        modal.addEventListener('touchend', function (event) {
+            endX = event.changedTouches[0].clientX;
+            endY = event.changedTouches[0].clientY;
+            handleSwipe();
+        });
+
+        // 处理滑动事件
+        function handleSwipe() {
+            const deltaX = endX - startX;
+            const deltaY = endY - startY;
+
+            // 仅处理水平滑动
+            if (Math.abs(deltaX) > Math.abs(deltaY)) {
+                if (deltaX < -50) {
+                    // 向左滑动，显示下一张图片
+                    currentIndex = (currentIndex + 1) % images.length;
+                    modalImg.src = images[currentIndex];
+                } else if (deltaX > 50) {
+                    // 向右滑动，显示上一张图片
+                    currentIndex = (currentIndex - 1 + images.length) % images.length;
+                    modalImg.src = images[currentIndex];
+                }
+            }
+        }
+
+        // 显示模态框并禁用页面滚动
+        function openModal(src, index) {
+            currentIndex = index;
+            modal.style.display = "block";
+            modalImg.src = src;
+            document.body.style.overflow = 'hidden'; // 禁用页面滚动
+        }
+
+        // 关闭模态框并恢复页面滚动
+        function closeModal() {
+            modal.style.display = "none";
+            document.body.style.overflow = ''; // 恢复页面滚动
+        }
+
+        // 添加点击事件到整个模态框
+        modal.addEventListener('click', function(event) {
+            if (event.target === modal || event.target === modalContent) {
+                closeModal(); // 点击模态框或模态框内容区域（不包括图片）时关闭
+            }
+        });
+
+        // 防止点击图片本身关闭
+        modalContent.addEventListener('click', function(event) {
+            event.stopPropagation(); // 阻止事件冒泡，避免点击图片时触发关闭
+        });
+
+        // 关闭模态框的按钮事件
+        modalClose.onclick = closeModal;
+
+        // 显示上一张图片
+        prev.onclick = function (event) {
+            event.stopPropagation(); // 防止事件冒泡到 modalContent
+            currentIndex = (currentIndex - 1 + images.length) % images.length;
+            modalImg.src = images[currentIndex];
+        }
+
+        // 显示下一张图片
+        next.onclick = function (event) {
+            event.stopPropagation(); // 防止事件冒泡到 modalContent
+            currentIndex = (currentIndex + 1) % images.length;
+            modalImg.src = images[currentIndex];
+        }
+    </script>
+</body>
+
+</html>
