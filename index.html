@@ -5,25 +5,27 @@
     <meta charset="UTF-8">
     <title>照片墙</title>
     <style>
-         body {
+        body {
             background-color: #F5F5DC;
             margin: 0;
             overflow: auto;
         }
 
         .box {
-            column-gap: 10px; /* 列之间的间距 */
+            display: grid;
+            gap: 10px; /* 图片之间的间距 */
             padding: 10px;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* 自动填充列，最小宽度200px，最大为1fr */
+            grid-auto-rows: minmax(150px, auto); /* 自动行高，最小150px，高度根据内容自动调整 */
         }
 
         .box img {
             width: 100%;
-            height: auto;
-            margin-bottom: 10px; /* 图片之间的垂直间距 */
+            height: 100%;
+            object-fit: cover; /* 确保图片填充整个网格单元格 */
             box-shadow: 1px 1px 5px #0bd9e2;
             border-radius: 11px;
             transition: transform 0.5s ease;
-            display: block; /* 使得图片能够在列中正确排列 */
         }
 
         .box img:hover {
@@ -89,46 +91,6 @@
 
         .next {
             right: 20px;
-        }
-
-        /* 默认列数 */
-        .box {
-            column-count: 4;
-        }
-
-        /* 超大屏幕 (宽度 >= 1200px) */
-        @media (min-width: 1200px) {
-            .box {
-                column-count: 8;
-            }
-        }
-
-        /* 大屏幕 (宽度 >= 1200px) */
-        @media (min-width: 1200px) and (max-width: 2000px) {
-            .box {
-                column-count: 6;
-            }
-        }
-
-        /* 中等屏幕 (宽度 >= 768px) */
-        @media (min-width: 768px) and (max-width: 1199px) {
-            .box {
-                column-count: 4;
-            }
-        }
-
-        /* 小屏幕 (宽度 < 768px) */
-        @media (max-width: 767px) {
-            .box {
-                column-count: 2;
-            }
-        }
-
-        /* 超小屏幕 (宽度 < 480px) */
-        @media (max-width: 480px) {
-            .box {
-                column-count: 1;
-            }
         }
 
         /* 处理横屏设备 */
